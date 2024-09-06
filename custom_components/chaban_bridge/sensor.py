@@ -43,7 +43,7 @@ class ChabanBridgeDataUpdateCoordinator(DataUpdateCoordinator):
                 async with session.get(
                     "https://opendata.bordeaux-metropole.fr/api/explore/v2.1/catalog/datasets/previsions_pont_chaban/records",
                     params={
-                        "where": f"date_passage > '{datetime.now().strftime('%Y-%m-%d')}'",
+                        "where": f"date_passage >= '{datetime.now().strftime('%Y-%m-%d')}'",
                         "limit": 5,
                     },
                 ) as response:
