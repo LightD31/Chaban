@@ -1,0 +1,11 @@
+{
+    "domain": "chaban_bridge",
+    "name": "Chaban Bridge",
+    "documentation": "https://github.com/lightd31/chaban_bridge",
+    "dependencies": [],
+    "codeowners": ["@lightd31"],
+    "requirements": ["requests"],
+    "iot_class": "cloud_polling",
+    "version": "0.1.0",
+    "config_flow": true
+  }
