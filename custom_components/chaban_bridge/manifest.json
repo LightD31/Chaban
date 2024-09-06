@@ -1,7 +1,7 @@
 {
     "domain": "chaban_bridge",
     "name": "Chaban Bridge",
-    "documentation": "https://github.com/lightd31/chaban_bridge",
+    "documentation": "https://github.com/lightd31/Chaban",
     "dependencies": [],
     "codeowners": ["@lightd31"],
     "requirements": ["requests"],
