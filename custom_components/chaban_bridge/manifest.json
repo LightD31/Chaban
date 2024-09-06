@@ -2,6 +2,7 @@
     "domain": "chaban_bridge",
     "name": "Chaban Bridge",
     "documentation": "https://github.com/lightd31/Chaban",
+    "issue_tracker": "https://github.com/lightd31/Chaban",
     "dependencies": [],
     "codeowners": ["@lightd31"],
     "requirements": ["requests"],
