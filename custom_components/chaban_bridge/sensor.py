@@ -72,16 +72,17 @@ class ChabanBridgeSensor(SensorEntity):
 
     @property
     def name(self):
-        return "Chaban Bridge Next Closure"
+        return "Chaban Bridge Next 5 Closures"
 
     @property
     def unique_id(self):
-        return "chaban_bridge_next_closure"
+        return "chaban_bridge_next_5_closures"
 
     @property
     def state(self):
         if not self.coordinator.data:
             return None
+        # Return the date and time of the next closure as the main state
         next_closure = self.coordinator.data[0]
         return next_closure['fermeture_a_la_circulation'].isoformat()
 
@@ -89,15 +90,18 @@ class ChabanBridgeSensor(SensorEntity):
     def extra_state_attributes(self):
         if not self.coordinator.data:
             return {}
-        next_closure = self.coordinator.data[0]
-        return {
-            "bateau": next_closure["bateau"],
-            "date_passage": next_closure["fermeture_a_la_circulation"].date().isoformat(),
-            "fermeture_a_la_circulation": next_closure["fermeture_a_la_circulation"].isoformat(),
-            "re_ouverture_a_la_circulation": next_closure["re_ouverture_a_la_circulation"].isoformat(),
-            "type_de_fermeture": next_closure["type_de_fermeture"],
-            "fermeture_totale": next_closure["fermeture_totale"],
-        }
+        # Create a list of closures with details
+        closures = []
+        for closure in self.coordinator.data[:5]:  # Limit to the first 5 closures
+            closures.append({
+                "bateau": closure["bateau"],
+                "date_passage": closure["fermeture_a_la_circulation"].date().isoformat(),
+                "fermeture_a_la_circulation": closure["fermeture_a_la_circulation"].isoformat(),
+                "re_ouverture_a_la_circulation": closure["re_ouverture_a_la_circulation"].isoformat(),
+                "type_de_fermeture": closure["type_de_fermeture"],
+                "fermeture_totale": closure["fermeture_totale"],
+            })
+        return {"closures": closures}
 
     @property
     def should_poll(self):
