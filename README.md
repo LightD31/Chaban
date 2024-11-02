@@ -1,6 +1,3 @@
-# Chaban Bridge
-
-[![GitHub release](https://img.shields.io/github/release/lightd31/Chaban.svg)](https://github.com/lightd31/Chaban/releases)
 [![License](https://img.shields.io/github/license/lightd31/Chaban.svg)](https://github.com/lightd31/Chaban/blob/main/LICENSE)
 
 ## Description
@@ -40,4 +37,4 @@ Une fois configuré, le composant "Chaban Bridge" ajoutera un capteur qui fourni
 
 ## Licence
 
-Ce projet est sous licence GNU General Public License v3.0. Voir le fichier [LICENSE](https://github.com/lightd31/Chaban/blob/main/LICENSE) pour plus de détails.
+Ce projet est sous licence MIT. Voir le fichier [LICENSE](https://github.com/lightd31/Chaban/blob/main/LICENSE) pour plus de détails.
