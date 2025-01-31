@@ -72,11 +72,11 @@ class ChabanBridgeSensor(SensorEntity):
 
     @property
     def name(self):
-        return "Chaban Bridge Next 5 Closures"
+        return "Pont Chaban Delmas"
 
     @property
     def unique_id(self):
-        return "chaban_bridge_next_5_closures"
+        return "chaban_bridge"
 
     @property
     def state(self):
