@@ -42,11 +42,7 @@ class ChabanBridgeDataUpdateCoordinator(DataUpdateCoordinator):
             async with aiohttp.ClientSession() as session:
                 # Get planned closures
                 async with session.get(
-                    "https://api.drndvs.fr/api/v1/chaban/nextclosure?limit=5",
-                    params={
-                        "where": f"date_passage >= '{datetime.now().strftime('%Y-%m-%d')}'",
-                        "limit": 5,
-                    },
+                    "https://api.drndvs.fr/api/v1/chaban/nextclosure?limit=5"
                 ) as response:
                     if response.status != 200:
                         raise UpdateFailed(f"Error communicating with API: {response.status}")
