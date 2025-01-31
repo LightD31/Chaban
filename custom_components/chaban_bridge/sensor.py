@@ -40,8 +40,9 @@ class ChabanBridgeDataUpdateCoordinator(DataUpdateCoordinator):
     async def _async_update_data(self):
         async with async_timeout.timeout(10):
             async with aiohttp.ClientSession() as session:
+                # Get planned closures
                 async with session.get(
-                    "https://opendata.bordeaux-metropole.fr/api/explore/v2.1/catalog/datasets/previsions_pont_chaban/records",
+                    "https://api.drndvs.fr/api/v1/chaban/nextclosure?limit=5",
                     params={
                         "where": f"date_passage >= '{datetime.now().strftime('%Y-%m-%d')}'",
                         "limit": 5,
@@ -49,10 +50,10 @@ class ChabanBridgeDataUpdateCoordinator(DataUpdateCoordinator):
                 ) as response:
                     if response.status != 200:
                         raise UpdateFailed(f"Error communicating with API: {response.status}")
-                    data = await response.json()
-                    results = data.get("results", [])
+                    closures_data = await response.json()
+                    results = closures_data.get("results", [])
                     
-                    # Convert string dates and times to datetime objects
+                    # Convert dates
                     for result in results:
                         date = datetime.strptime(result['date_passage'], '%Y-%m-%d')
                         result['fermeture_a_la_circulation'] = datetime.combine(
@@ -63,8 +64,19 @@ class ChabanBridgeDataUpdateCoordinator(DataUpdateCoordinator):
                             date.date(),
                             datetime.strptime(result['re_ouverture_a_la_circulation'], '%H:%M').time()
                         )
-                    
-                    return results
+
+                # Get current state
+                async with session.get(
+                    "https://api.drndvs.fr/api/v1/chaban/state"
+                ) as response:
+                    if response.status != 200:
+                        raise UpdateFailed(f"Error getting bridge state: {response.status}")
+                    state_data = await response.json()
+
+                return {
+                    "closures": results,
+                    "current_state": state_data
+                }
 
 class ChabanBridgeSensor(SensorEntity):
     def __init__(self, coordinator):
@@ -82,17 +94,15 @@ class ChabanBridgeSensor(SensorEntity):
     def state(self):
         if not self.coordinator.data:
             return None
-        # Return the date and time of the next closure as the main state
-        next_closure = self.coordinator.data[0]
-        return next_closure['fermeture_a_la_circulation'].isoformat()
+        return self.coordinator.data["current_state"]["state"]
 
     @property
     def extra_state_attributes(self):
         if not self.coordinator.data:
             return {}
-        # Create a list of closures with details
+        
         closures = []
-        for closure in self.coordinator.data[:5]:  # Limit to the first 5 closures
+        for closure in self.coordinator.data["closures"][:5]:
             closures.append({
                 "bateau": closure["bateau"],
                 "date_passage": closure["fermeture_a_la_circulation"].date().isoformat(),
@@ -101,7 +111,13 @@ class ChabanBridgeSensor(SensorEntity):
                 "type_de_fermeture": closure["type_de_fermeture"],
                 "fermeture_totale": closure["fermeture_totale"],
             })
-        return {"closures": closures}
+
+        return {
+            "current_state": self.coordinator.data["current_state"],
+            "is_closed": self.coordinator.data["current_state"]["is_closed"],
+            "last_update": self.coordinator.data["current_state"]["last_update"],
+            "closures": closures
+        }
 
     @property
     def should_poll(self):
