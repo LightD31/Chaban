@@ -46,8 +46,7 @@ class ChabanBridgeDataUpdateCoordinator(DataUpdateCoordinator):
                 ) as response:
                     if response.status != 200:
                         raise UpdateFailed(f"Error communicating with API: {response.status}")
-                    closures_data = await response.json()
-                    results = closures_data.get("results", [])
+                    results = await response.json()  # API retourne directement une liste
                     
                     # Convert dates
                     for result in results:
@@ -70,7 +69,7 @@ class ChabanBridgeDataUpdateCoordinator(DataUpdateCoordinator):
                     state_data = await response.json()
 
                 return {
-                    "closures": results,
+                    "closures": results,  # Utilisation directe de la liste results
                     "current_state": state_data
                 }
 
