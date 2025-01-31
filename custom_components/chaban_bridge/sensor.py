@@ -46,19 +46,12 @@ class ChabanBridgeDataUpdateCoordinator(DataUpdateCoordinator):
                 ) as response:
                     if response.status != 200:
                         raise UpdateFailed(f"Error communicating with API: {response.status}")
-                    results = await response.json()  # API retourne directement une liste
+                    results = await response.json()
                     
                     # Convert dates
                     for result in results:
-                        date = datetime.strptime(result['date_passage'], '%Y-%m-%d')
-                        result['fermeture_a_la_circulation'] = datetime.combine(
-                            date.date(),
-                            datetime.strptime(result['fermeture_a_la_circulation'], '%H:%M').time()
-                        )
-                        result['re_ouverture_a_la_circulation'] = datetime.combine(
-                            date.date(),
-                            datetime.strptime(result['re_ouverture_a_la_circulation'], '%H:%M').time()
-                        )
+                        result['start_date'] = datetime.fromisoformat(result['start_date'])
+                        result['end_date'] = datetime.fromisoformat(result['end_date'])
 
                 # Get current state
                 async with session.get(
@@ -69,7 +62,7 @@ class ChabanBridgeDataUpdateCoordinator(DataUpdateCoordinator):
                     state_data = await response.json()
 
                 return {
-                    "closures": results,  # Utilisation directe de la liste results
+                    "closures": results,
                     "current_state": state_data
                 }
 
@@ -99,12 +92,11 @@ class ChabanBridgeSensor(SensorEntity):
         closures = []
         for closure in self.coordinator.data["closures"][:5]:
             closures.append({
-                "bateau": closure["bateau"],
-                "date_passage": closure["fermeture_a_la_circulation"].date().isoformat(),
-                "fermeture_a_la_circulation": closure["fermeture_a_la_circulation"].isoformat(),
-                "re_ouverture_a_la_circulation": closure["re_ouverture_a_la_circulation"].isoformat(),
-                "type_de_fermeture": closure["type_de_fermeture"],
-                "fermeture_totale": closure["fermeture_totale"],
+                "reason": closure["reason"],
+                "date": closure["start_date"].date().isoformat(),
+                "start_date": closure["start_date"].isoformat(),
+                "end_date": closure["end_date"].isoformat(),
+                "closure_type": closure["closure_type"],
             })
 
         return {
