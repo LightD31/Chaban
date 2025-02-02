@@ -1,3 +1,5 @@
+# Pont Chaban Delmas pour Home Assistant
+
 [![License](https://img.shields.io/github/license/lightd31/Chaban.svg)](https://github.com/lightd31/Chaban/blob/main/LICENSE)
 
 ## Description
@@ -6,7 +8,21 @@ Le composant Home Assistant "Chaban Bridge" permet de surveiller les fermetures 
 
 ## Installation
 
-1. Clonez ce dépôt dans le répertoire `custom_components` de votre installation Home Assistant :
+### Option 1 : Via HACS (recommandé)
+
+1. Assurez-vous d'avoir [HACS](https://hacs.xyz/) installé
+2. Allez dans HACS > Intégrations > Menu (⋮) > Dépôts personnalisés
+3. Ajoutez le dépôt :
+   - URL : `https://github.com/lightd31/Chaban`
+   - Catégorie : Integration
+4. Cliquez sur "Ajouter"
+5. Recherchez "Chaban Bridge" dans les intégrations HACS
+6. Cliquez sur "Télécharger"
+7. Redémarrez Home Assistant
+
+### Option 2 : Installation manuelle
+
+1. Clonez ce dépôt dans le répertoire custom_components de votre installation Home Assistant :
 
     ```sh
     git clone https://github.com/lightd31/Chaban custom_components/chaban_bridge
