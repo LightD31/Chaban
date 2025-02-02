@@ -24,16 +24,29 @@ Le composant Home Assistant "Chaban Bridge" permet de surveiller les fermetures 
 
 Une fois configuré, le composant "Chaban Bridge" ajoutera un capteur qui fournira les informations suivantes :
 
-- **Nom** : Chaban Bridge Next Closure
-- **ID unique** : chaban_bridge_next_closure
-- **État** : Date et heure de la prochaine fermeture à la circulation
+- **Nom** : Pont Chaban Delmas
+- **ID unique** : chaban_bridge
+- **État** : État actuel du pont
 - **Attributs supplémentaires** :
-  - `bateau` : Nom du bateau
-  - `date_passage` : Date de passage du bateau
-  - `fermeture_a_la_circulation` : Date et heure de fermeture à la circulation
-  - `re_ouverture_a_la_circulation` : Date et heure de réouverture à la circulation
-  - `type_de_fermeture` : Type de fermeture
-  - `fermeture_totale` : Indique si la fermeture est totale
+  - `current_state` : État détaillé actuel du pont
+  - `is_closed` : Indique si le pont est fermé
+  - `last_update` : Dernière mise à jour des données
+  - `closures` : Liste des 5 prochaines fermetures avec :
+    - `reason` : Raison de la fermeture
+    - `date` : Date de la fermeture
+    - `start_date` : Date et heure de début de fermeture
+    - `end_date` : Date et heure de fin de fermeture
+    - `closure_type` : Type de fermeture
+
+## Carte Lovelace Personnalisée
+
+Une carte Lovelace dédiée a été développée pour afficher les informations de manière plus visuelle. Vous pouvez l'installer depuis :
+https://github.com/LightD31/lovelace-chaban-bridge
+
+Cette carte permet d'afficher :
+- L'état actuel du pont
+- Les prochaines fermetures prévues
+- Une visualisation temporelle des fermetures
 
 ## Licence
 
