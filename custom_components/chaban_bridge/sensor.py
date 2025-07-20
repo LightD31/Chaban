@@ -67,12 +67,12 @@ class ChabanBridgeDataUpdateCoordinator(DataUpdateCoordinator):
                     ) as response:
                         if response.status != 200:
                             raise UpdateFailed(f"Error communicating with API: {response.status}")
-                        results = await response.json()
+                        closures_data = await response.json()
 
-                        # Convert dates
-                        for result in results:
-                            result['start_date'] = datetime.fromisoformat(result['start_date'])
-                            result['end_date'] = datetime.fromisoformat(result['end_date'])
+                        # Convert dates for each closure
+                        for closure in closures_data.get("closures", []):
+                            closure['start_date'] = datetime.fromisoformat(closure['start_date'])
+                            closure['end_date'] = datetime.fromisoformat(closure['end_date'])
 
                     # Get current state
                     async with session.get(API_STATE_URL) as response:
@@ -81,7 +81,8 @@ class ChabanBridgeDataUpdateCoordinator(DataUpdateCoordinator):
                         state_data = await response.json()
 
                     return {
-                        "closures": results,
+                        "closures": closures_data.get("closures", []),
+                        "count": closures_data.get("count", 0),
                         "current_state": state_data
                     }
         except TimeoutError as exc:
@@ -147,16 +148,18 @@ class ChabanBridgeSensor(SensorEntity):
             for closure in self.coordinator.data["closures"][:5]:
                 closures.append({
                     "reason": closure["reason"],
-                    "date": closure["start_date"].date().isoformat(),
                     "start_date": closure["start_date"].isoformat(),
                     "end_date": closure["end_date"].isoformat(),
                     "closure_type": closure["closure_type"],
+                    "duration_minutes": closure.get("duration_minutes"),
                 })
 
             self._attr_extra_state_attributes = {
                 "current_state": self.coordinator.data["current_state"],
                 "is_closed": self.coordinator.data["current_state"]["is_closed"],
                 "last_update": self.coordinator.data["current_state"]["last_update"],
+                "bridge_name": self.coordinator.data["current_state"]["name"],
+                "closures_count": self.coordinator.data.get("count", 0),
                 "closures": closures
             }
 

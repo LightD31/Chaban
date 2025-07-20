@@ -36,7 +36,7 @@ class ChabanBridgeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Optional(
                     CONF_UPDATE_INTERVAL,
                     default=DEFAULT_UPDATE_INTERVAL
-                ): vol.All(int, vol.Range(min=300, max=86400)),
+                ): vol.All(int, vol.Range(min=60, max=86400)),
             }
         )
 
@@ -44,7 +44,7 @@ class ChabanBridgeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="user",
             data_schema=data_schema,
             description_placeholders={
-                "min_interval": "300",
+                "min_interval": "60",
                 "max_interval": "86400",
                 "default_interval": str(DEFAULT_UPDATE_INTERVAL),
             }
