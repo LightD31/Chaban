@@ -1,7 +1,6 @@
 """Support for Chaban Bridge sensor."""
 from __future__ import annotations
 
-import asyncio
 import aiohttp
 import async_timeout
 from datetime import datetime, timedelta
@@ -15,13 +14,12 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
     UpdateFailed,
-    CoordinatorEntity,
 )
 from homeassistant.helpers.device_registry import DeviceInfo
 
 from .const import (
-    DOMAIN, 
-    CONF_UPDATE_INTERVAL, 
+    DOMAIN,
+    CONF_UPDATE_INTERVAL,
     DEFAULT_UPDATE_INTERVAL,
     API_CLOSURES_URL,
     API_STATE_URL,
@@ -48,7 +46,7 @@ async def async_setup_entry(
 
 class ChabanBridgeDataUpdateCoordinator(DataUpdateCoordinator):
     """Class to manage fetching data from the API."""
-    
+
     def __init__(self, hass: HomeAssistant, update_interval: timedelta) -> None:
         """Initialize the coordinator."""
         super().__init__(
@@ -70,7 +68,7 @@ class ChabanBridgeDataUpdateCoordinator(DataUpdateCoordinator):
                         if response.status != 200:
                             raise UpdateFailed(f"Error communicating with API: {response.status}")
                         results = await response.json()
-                        
+
                         # Convert dates
                         for result in results:
                             result['start_date'] = datetime.fromisoformat(result['start_date'])
@@ -86,27 +84,23 @@ class ChabanBridgeDataUpdateCoordinator(DataUpdateCoordinator):
                         "closures": results,
                         "current_state": state_data
                     }
-        except asyncio.TimeoutError as exc:
+        except TimeoutError as exc:
             raise UpdateFailed("Timeout communicating with API") from exc
         except aiohttp.ClientError as exc:
             raise UpdateFailed(f"Error communicating with API: {exc}") from exc
 
-class ChabanBridgeSensor(CoordinatorEntity, SensorEntity):
+class ChabanBridgeSensor(SensorEntity):
     """Representation of a Chaban Bridge sensor."""
-    
+
     def __init__(self, coordinator: ChabanBridgeDataUpdateCoordinator, config_entry: ConfigEntry) -> None:
         """Initialize the sensor."""
-        super().__init__(coordinator)
+        self.coordinator = coordinator
         self._config_entry = config_entry
         self._attr_unique_id = "chaban_bridge"
         self._attr_name = "Pont Chaban Delmas"
-        self._attr_icon = "mdi:bridge"
         self._attr_device_class = SensorDeviceClass.ENUM
-
-    @property
-    def device_info(self) -> DeviceInfo:
-        """Return device information about this sensor."""
-        return DeviceInfo(
+        self._attr_should_poll = False
+        self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, "chaban_bridge")},
             name="Pont Chaban-Delmas",
             manufacturer=MANUFACTURER,
@@ -114,42 +108,56 @@ class ChabanBridgeSensor(CoordinatorEntity, SensorEntity):
             sw_version="1.0",
             configuration_url="https://github.com/lightd31/Chaban",
         )
+        # Initialize attributes with default values
+        self._attr_native_value = None
+        self._attr_icon = "mdi:bridge"
+        self._attr_extra_state_attributes = {}
+        self._attr_available = True
 
-    @property
-    def state(self) -> str | None:
-        """Return the state of the sensor."""
+    async def async_added_to_hass(self) -> None:
+        """When entity is added to hass."""
+        await super().async_added_to_hass()
+        self.async_on_remove(
+            self.coordinator.async_add_listener(self._handle_coordinator_update)
+        )
+
+    async def async_update(self) -> None:
+        """Update the entity. Only used by the generic entity update service."""
+        await self.coordinator.async_request_refresh()
+
+    def _handle_coordinator_update(self) -> None:
+        """Handle updated data from the coordinator."""
+        # Update availability based on coordinator success
+        self._attr_available = self.coordinator.last_update_success
+
         if not self.coordinator.data:
-            return None
-        return self.coordinator.data["current_state"]["state"]
+            self._attr_native_value = None
+            self._attr_icon = "mdi:bridge"
+            self._attr_extra_state_attributes = {}
+        else:
+            # Update native value
+            self._attr_native_value = self.coordinator.data["current_state"]["state"]
 
-    @property
-    def icon(self) -> str:
-        """Return the icon for the sensor."""
-        if not self.coordinator.data:
-            return "mdi:bridge"
-        
-        is_closed = self.coordinator.data["current_state"].get("is_closed", False)
-        return "mdi:bridge-off" if is_closed else "mdi:bridge"
+            # Update icon based on bridge state
+            is_closed = self.coordinator.data["current_state"].get("is_closed", False)
+            self._attr_icon = "mdi:bridge-off" if is_closed else "mdi:bridge"
 
-    @property
-    def extra_state_attributes(self) -> dict[str, Any]:
-        """Return the state attributes."""
-        if not self.coordinator.data:
-            return {}
-        
-        closures = []
-        for closure in self.coordinator.data["closures"][:5]:
-            closures.append({
-                "reason": closure["reason"],
-                "date": closure["start_date"].date().isoformat(),
-                "start_date": closure["start_date"].isoformat(),
-                "end_date": closure["end_date"].isoformat(),
-                "closure_type": closure["closure_type"],
-            })
+            # Update extra state attributes
+            closures = []
+            for closure in self.coordinator.data["closures"][:5]:
+                closures.append({
+                    "reason": closure["reason"],
+                    "date": closure["start_date"].date().isoformat(),
+                    "start_date": closure["start_date"].isoformat(),
+                    "end_date": closure["end_date"].isoformat(),
+                    "closure_type": closure["closure_type"],
+                })
 
-        return {
-            "current_state": self.coordinator.data["current_state"],
-            "is_closed": self.coordinator.data["current_state"]["is_closed"],
-            "last_update": self.coordinator.data["current_state"]["last_update"],
-            "closures": closures
-        }
+            self._attr_extra_state_attributes = {
+                "current_state": self.coordinator.data["current_state"],
+                "is_closed": self.coordinator.data["current_state"]["is_closed"],
+                "last_update": self.coordinator.data["current_state"]["last_update"],
+                "closures": closures
+            }
+
+        self.async_write_ha_state()
