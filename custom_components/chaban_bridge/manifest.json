@@ -1,12 +1,13 @@
 {
-    "domain": "chaban_bridge",
-    "name": "Chaban Bridge",
-    "documentation": "https://github.com/lightd31/Chaban",
-    "issue_tracker": "https://github.com/lightd31/Chaban",
-    "dependencies": [],
-    "codeowners": ["@lightd31"],
-    "requirements": ["requests"],
-    "iot_class": "cloud_polling",
-    "version": "0.1.0",
-    "config_flow": true
-  }
+  "domain": "chaban_bridge",
+  "name": "Chaban Bridge",
+  "documentation": "https://github.com/lightd31/Chaban",
+  "issue_tracker": "https://github.com/lightd31/Chaban/issues",
+  "dependencies": [],
+  "codeowners": ["@lightd31"],
+  "requirements": ["aiohttp"],
+  "iot_class": "cloud_polling",
+  "version": "1.0.0",
+  "config_flow": true,
+  "integration_type": "service"
+}

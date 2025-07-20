@@ -1,0 +1,43 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Chaban-Delmas Bridge Configuration",
+        "description": "Configure the integration to monitor the Chaban-Delmas bridge.",
+        "data": {
+          "update_interval": "Update interval (seconds)"
+        },
+        "data_description": {
+          "update_interval": "Data update frequency (between {min_interval} and {max_interval} seconds, default: {default_interval})"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to API",
+      "invalid_auth": "Invalid authentication",
+      "unknown": "Unexpected error occurred"
+    },
+    "abort": {
+      "already_configured": "Device is already configured",
+      "single_instance_allowed": "Only a single instance is allowed"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "chaban_bridge": {
+        "name": "Chaban-Delmas Bridge",
+        "state": {
+          "open": "Open",
+          "closed": "Closed",
+          "maintenance": "Maintenance",
+          "unknown": "Unknown"
+        }
+      }
+    }
+  },
+  "services": {},
+  "exceptions": {
+    "update_failed": "Failed to update data",
+    "api_error": "API error"
+  }
+}

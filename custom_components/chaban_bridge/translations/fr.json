@@ -1,0 +1,43 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configuration du Pont Chaban-Delmas",
+        "description": "Configurez l'intégration pour surveiller le pont Chaban-Delmas.",
+        "data": {
+          "update_interval": "Intervalle de mise à jour (secondes)"
+        },
+        "data_description": {
+          "update_interval": "Fréquence de mise à jour des données (entre {min_interval} et {max_interval} secondes, par défaut: {default_interval})"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Impossible de se connecter à l'API",
+      "invalid_auth": "Authentification invalide",
+      "unknown": "Erreur inattendue"
+    },
+    "abort": {
+      "already_configured": "L'appareil est déjà configuré",
+      "single_instance_allowed": "Une seule instance est autorisée"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "chaban_bridge": {
+        "name": "Pont Chaban-Delmas",
+        "state": {
+          "open": "Ouvert",
+          "closed": "Fermé",
+          "maintenance": "Maintenance",
+          "unknown": "Inconnu"
+        }
+      }
+    }
+  },
+  "services": {},
+  "exceptions": {
+    "update_failed": "Échec de la mise à jour des données",
+    "api_error": "Erreur de l'API"
+  }
+}
