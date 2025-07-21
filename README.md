@@ -1,8 +1,8 @@
 # Pont Chaban Delmas pour Home Assistant
 
 [![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/custom-components/hacs)
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/LightD31/Chaban?style=for-the-badge)](https://github.com/LightD31/Chaban/releases)
-[![GitHub](https://img.shields.io/github/license/LightD31/Chaban?style=for-the-badge)](https://github.com/LightD31/Chaban/blob/main/LICENSE)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/LightD31/chaban-ha?style=for-the-badge)](https://github.com/LightD31/Chaban/releases)
+[![GitHub](https://img.shields.io/github/license/LightD31/chaban-ha?style=for-the-badge)](https://github.com/LightD31/Chaban/blob/main/LICENSE)
 
 Une intégration Home Assistant pour surveiller les fermetures et réouvertures du pont Chaban-Delmas à Bordeaux en temps réel.
 
